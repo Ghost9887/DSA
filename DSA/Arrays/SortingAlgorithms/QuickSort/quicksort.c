@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <time.h>
 
+void quickSort(int arr[], int low, int high);
+int partition(int arr[], int low, int high);
 void swap(int *a, int *b);
-void bubbleSort(int arr[], int size);
 void printArray(int arr[], int size);
 
 int main() {
 
   int arr[] = {
+
       0, 3, 1, 4, 7, 8, 9, 2, 5, 6, 5, 2, 6, 1, 9, 3, 0, 7, 8, 4, 8, 4, 7, 0, 6,
       9, 5, 1, 3, 2, 1, 9, 3, 5, 0, 7, 6, 4, 2, 8, 4, 6, 8, 2, 0, 5, 3, 9, 1, 7,
       9, 0, 5, 6, 2, 8, 4, 7, 3, 1, 7, 1, 4, 3, 6, 0, 9, 2, 8, 5, 6, 3, 0, 1, 8,
@@ -35,23 +37,21 @@ int main() {
 
   int size = sizeof(arr) / sizeof(arr[0]);
 
-  printf("Before bubbleSort: ");
+  printf("Before quick sort: ");
   printArray(arr, size);
   printf("\n");
 
   clock_t t;
   t = clock();
-
-  bubbleSort(arr, size);
-
+  quickSort(arr, 0, size - 1);
   t = clock() - t;
-  double time_taken = ((double)t) / CLOCKS_PER_SEC;
+  double timeTaken = ((double)t) / CLOCKS_PER_SEC;
 
-  printf("After bubbleSort: ");
+  printf("After quick sort: ");
   printArray(arr, size);
   printf("\n");
 
-  printf("Time: %f\n", time_taken);
+  printf("Time: %f\n", timeTaken);
 
   return 0;
 }
@@ -62,19 +62,27 @@ void swap(int *a, int *b) {
   *b = temp;
 }
 
-void bubbleSort(int arr[], int size) {
-  bool swapped;
-  for (int i = 0; i < size - 1; i++) {
-    swapped = false;
-    for (int j = 1; j < size - i; j++) {
-      if (arr[j] < arr[j - 1]) {
-        swap(&arr[j], &arr[j - 1]);
-        swapped = true;
-      }
+int partition(int arr[], int low, int high) {
+  int pivot = arr[high];
+  int i = low - 1;
+
+  for (int j = low; j < high; j++) {
+    if (arr[j] <= pivot) {
+      i += 1;
+      swap(&arr[i], &arr[j]);
     }
-    if (!swapped) {
-      break;
-    }
+  }
+
+  swap(&arr[i + 1], &arr[high]);
+  return i + 1;
+}
+
+void quickSort(int arr[], int low, int high) {
+
+  if (low < high) {
+    int pivot_index = partition(arr, low, high);
+    quickSort(arr, low, pivot_index - 1);
+    quickSort(arr, pivot_index + 1, high);
   }
 }
 
