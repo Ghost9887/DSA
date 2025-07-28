@@ -4,6 +4,8 @@
 void linearSearch(int arr[], int size, int target);
 void generateArray(int arr[], int length);
 
+int NUMBEROFOPERATIONS = 0;
+
 int main() {
 
   int arr[500];
@@ -15,15 +17,9 @@ int main() {
   int target = 494;
   printf("Target: %d\n", target);
 
-  clock_t t;
-  t = clock();
-
   linearSearch(arr, size, target);
 
-  t = clock() - t;
-  double time_taken = ((double)t) / CLOCKS_PER_SEC;
-
-  printf("Time: %f\n", time_taken);
+  printf("Number of operations: %d\n", NUMBEROFOPERATIONS);
 
   return 0;
 }
@@ -35,10 +31,11 @@ void generateArray(int arr[], int length) {
 }
 
 void linearSearch(int arr[], int size, int target) {
-
   for (int i = 0; i < size; i++) {
+    NUMBEROFOPERATIONS++;
     if (arr[i] == target) {
       printf("Found target at index: %d\n", i);
+      break;
     }
   }
 }
