@@ -10,13 +10,6 @@ struct node {
   struct node *next;
 };
 
-void setNode(struct node *node, char *key, char *value) {
-  node->key = key;
-  node->value = value;
-  node->next = NULL;
-  return;
-};
-
 struct hashMap {
   int numOfElements, capacity;
   struct node **arr;
@@ -45,7 +38,9 @@ int hashFunction(struct hashMap *mp, char *key) {
 void insert(struct hashMap *mp, char *key, char *value) {
   int bucketIndex = hashFunction(mp, key);
   struct node *newNode = (struct node *)malloc(sizeof(struct node));
-  setNode(newNode, key, value);
+  newNode->key = key;
+  newNode->value = value;
+  newNode->next = NULL;
   if (mp->arr[bucketIndex] == NULL) {
     mp->arr[bucketIndex] = newNode;
   } else {
@@ -60,14 +55,10 @@ void delete(struct hashMap *mp, char *key) {
   struct node *prevNode = NULL;
   struct node *currNode = mp->arr[bucketIndex];
   while (currNode != NULL) {
-
     if (strcmp(key, currNode->key) == 0) {
-
       if (currNode == mp->arr[bucketIndex]) {
         mp->arr[bucketIndex] = currNode->next;
-      }
-
-      else {
+      } else {
         prevNode->next = currNode->next;
       }
       free(currNode);
@@ -80,9 +71,7 @@ void delete(struct hashMap *mp, char *key) {
 }
 
 char *search(struct hashMap *mp, char *key) {
-
   int bucketIndex = hashFunction(mp, key);
-
   struct node *bucketHead = mp->arr[bucketIndex];
   while (bucketHead != NULL) {
 
@@ -91,7 +80,6 @@ char *search(struct hashMap *mp, char *key) {
     }
     bucketHead = bucketHead->next;
   }
-
   char *errorMssg = (char *)malloc(sizeof(char) * 25);
   errorMssg = "Oops! No data found.\n";
   return errorMssg;
@@ -102,10 +90,15 @@ int main() {
   struct hashMap *mp = (struct hashMap *)malloc(sizeof(struct hashMap));
   initializeHashMap(mp);
 
+  printf("Added Yogaholic -> Anjali\n");
   insert(mp, "Yogaholic", "Anjali");
+  printf("Added pluto14 -> Vartika\n");
   insert(mp, "pluto14", "Vartika");
+  printf("Added elite_Programmer -> Manish\n");
   insert(mp, "elite_Programmer", "Manish");
+  printf("Added GFG -> GeeksforGeeks\n");
   insert(mp, "GFG", "GeeksforGeeks");
+  printf("Added decentBoy -> Mayank\n");
   insert(mp, "decentBoy", "Mayank");
 
   printf("%s\n", search(mp, "elite_Programmer"));
@@ -114,12 +107,10 @@ int main() {
   printf("%s\n", search(mp, "decentBoy"));
   printf("%s\n", search(mp, "GFG"));
 
-  // Key is not inserted
   printf("%s\n", search(mp, "randomKey"));
 
   printf("\nAfter deletion : \n");
 
-  // Deletion of key
   delete(mp, "decentBoy");
   printf("%s\n", search(mp, "decentBoy"));
 
