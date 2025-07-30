@@ -51,6 +51,8 @@ void initializeMatrix(int matrix[4][4]){
 
 void addToGraph(int matrix[4][4], Letter connection1, Letter connection2){
   matrix[connection1][connection2] = 1;
+
+  //removing this make it a directed graph
   matrix[connection2][connection1] = 1; 
 }
 
