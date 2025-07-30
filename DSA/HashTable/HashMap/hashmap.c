@@ -5,9 +5,7 @@
 #include <string.h>
 
 struct node {
-
   char *key;
-
   char *value;
   struct node *next;
 };
@@ -20,17 +18,13 @@ void setNode(struct node *node, char *key, char *value) {
 };
 
 struct hashMap {
-
   int numOfElements, capacity;
-
   struct node **arr;
 };
 
 void initializeHashMap(struct hashMap *mp) {
-
   mp->capacity = 100;
   mp->numOfElements = 0;
-
   mp->arr = (struct node **)malloc(sizeof(struct node *) * mp->capacity);
   return;
 }
@@ -39,10 +33,8 @@ int hashFunction(struct hashMap *mp, char *key) {
   int bucketIndex;
   int sum = 0, factor = 31;
   for (int i = 0; i < strlen(key); i++) {
-
     sum = ((sum % mp->capacity) + (((int)key[i]) * factor) % mp->capacity) %
           mp->capacity;
-
     factor = ((factor % __INT16_MAX__) * (31 % __INT16_MAX__)) % __INT16_MAX__;
   }
 
@@ -51,20 +43,12 @@ int hashFunction(struct hashMap *mp, char *key) {
 }
 
 void insert(struct hashMap *mp, char *key, char *value) {
-
   int bucketIndex = hashFunction(mp, key);
-  struct node *newNode = (struct node *)malloc(
-
-      sizeof(struct node));
-
+  struct node *newNode = (struct node *)malloc(sizeof(struct node));
   setNode(newNode, key, value);
-
   if (mp->arr[bucketIndex] == NULL) {
     mp->arr[bucketIndex] = newNode;
-  }
-
-  else {
-
+  } else {
     newNode->next = mp->arr[bucketIndex];
     mp->arr[bucketIndex] = newNode;
   }
@@ -72,13 +56,9 @@ void insert(struct hashMap *mp, char *key, char *value) {
 }
 
 void delete(struct hashMap *mp, char *key) {
-
   int bucketIndex = hashFunction(mp, key);
-
   struct node *prevNode = NULL;
-
   struct node *currNode = mp->arr[bucketIndex];
-
   while (currNode != NULL) {
 
     if (strcmp(key, currNode->key) == 0) {
