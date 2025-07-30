@@ -20,6 +20,7 @@ int hashFunction(HashSet *hs, char *key);
 void insert(HashSet *hs, char *key, char *value);
 void delete(HashSet *hs, char *key);
 bool contains(HashSet *hs, char *key);
+char *get(HashSet *hs, char *key);
 
 int main() {
   HashSet *hs = (HashSet *)malloc(sizeof(HashSet));
@@ -47,6 +48,8 @@ int main() {
 
   delete(hs, "decentBoy");
   printf("decentBoy contains: %b\n", contains(hs, "decentBoy"));
+
+  printf("Get value from 'Yogaholic': %s\n", get(hs, "Yogaholic"));
 
   return 0;
 }
@@ -113,4 +116,19 @@ int hashFunction(HashSet *hs, char *key) {
 
   bucketIndex = sum;
   return bucketIndex;
+}
+
+char *get(HashSet *hs, char *key) {
+  int bucketIndex = hashFunction(hs, key);
+  struct node *bucketHead = hs->array[bucketIndex];
+  while (bucketHead != NULL) {
+
+    if (bucketHead->key == key) {
+      return bucketHead->value;
+    }
+    bucketHead = bucketHead->next;
+  }
+  char *errorMssg = (char *)malloc(sizeof(char) * 25);
+  errorMssg = "Oops! No data found.\n";
+  return errorMssg;
 }
