@@ -21,7 +21,7 @@ void createNewAdjacencyList(Verticie *from, Verticie *to);
 void createEdge(Verticie *from, Verticie *to);
 void printAdjacencyList(Verticie *v);
 void DFS(Verticie *verticie);
-void DFSHelper(bool *arr, Verticie *verticie);
+void DFSHelper(bool *arr, Verticie *verticie, Verticie *parentVerticie);
 
 bool isCyclic = false;
 
@@ -84,22 +84,19 @@ void createNewAdjacencyList(Verticie *from, Verticie *to) {
 }
 
 void DFS(Verticie *verticie) {
-
   bool arr[4] = {0};
-  DFSHelper(arr, verticie);
+  DFSHelper(arr, verticie, verticie);
 }
 
-void DFSHelper(bool *arr, Verticie *verticie) {
-
+void DFSHelper(bool *arr, Verticie *verticie, Verticie *parentVerticie) {
   arr[verticie->letter] = true;
   printf("%c -> ", 'A' + verticie->letter);
-
   AdjacencyList *current = verticie->list;
-
   while (current != NULL) {
     if (arr[current->neighbour->letter] == false) {
-      DFSHelper(arr, current->neighbour);
-    } else if (arr[current->neighbour->letter] == true) {
+      DFSHelper(arr, current->neighbour, verticie);
+    } else if (arr[current->neighbour->letter] == true &&
+               parentVerticie->letter != current->neighbour->letter) {
       isCyclic = true;
     }
     current = current->next;
