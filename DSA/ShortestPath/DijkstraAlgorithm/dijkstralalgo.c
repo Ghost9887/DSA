@@ -1,5 +1,4 @@
 #include <limits.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +9,6 @@ typedef struct Verticie Verticie;
 
 typedef struct AdjList {
   Verticie *neighbour;
-  Verticie *current;
   int weight;
   struct AdjList *next;
 } AdjList;
@@ -107,7 +105,6 @@ void createNewList(Verticie *from, Verticie *to, int weight) {
   newList->neighbour = to;
   newList->weight = weight;
   newList->next = NULL;
-  newList->current = from;
 
   if (from->list == NULL) {
     from->list = newList;
