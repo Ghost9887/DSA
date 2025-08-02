@@ -4,20 +4,20 @@
 
 typedef enum { A, B, C, D } Letter;
 
-typedef struct Verticie Verticie;
+typedef struct Vertex Vertex;
 
 typedef struct AdjacencyList {
-  Verticie *neighbour;
+  Vertex *neighbour;
   struct AdjacencyList *next;
 } AdjacencyList;
 
-struct Verticie {
+struct Vertex {
   Letter letter;
   AdjacencyList *list;
 };
 
 typedef struct Node {
-  Verticie *verticie;
+  Vertex *vertex;
   struct Node *next;
 } Node;
 
@@ -27,25 +27,25 @@ typedef struct {
   Node *next;
 } Queue;
 
-Verticie *createNewVerticie(Letter letter);
-void createNewAdjacencyList(Verticie *from, Verticie *to);
-void createEdge(Verticie *from, Verticie *to);
-void printAdjacencyList(Verticie *v);
-void DFSHelper(bool *arr, Verticie *verticie);
-void DFS(Verticie *verticie);
+Vertex *createNewVertex(Letter letter);
+void createNewAdjacencyList(Vertex *from, Vertex *to);
+void createEdge(Vertex *from, Vertex *to);
+void printAdjacencyList(Vertex *v);
+void DFSHelper(bool *arr, Vertex *vertex);
+void DFS(Vertex *vertex);
 Queue *createQueue();
-void enqueue(Queue *q, Verticie *verticie);
-Verticie *dequeue(Queue *q);
+void enqueue(Queue *q, Vertex *vertex);
+Vertex *dequeue(Queue *q);
 void isEmpty();
 void printQueue(Queue *q);
-void BFS(Queue *q, Verticie *verticie);
+void BFS(Queue *q, Vertex *vertex);
 
 int main() {
 
-  Verticie *v1 = createNewVerticie(A);
-  Verticie *v2 = createNewVerticie(B);
-  Verticie *v3 = createNewVerticie(C);
-  Verticie *v4 = createNewVerticie(D);
+  Vertex *v1 = createNewVertex(A);
+  Vertex *v2 = createNewVertex(B);
+  Vertex *v3 = createNewVertex(C);
+  Vertex *v4 = createNewVertex(D);
   createEdge(v1, v2);
   createEdge(v2, v3);
   createEdge(v1, v4);
@@ -67,20 +67,20 @@ int main() {
   return 0;
 }
 
-Verticie *createNewVerticie(Letter letter) {
-  Verticie *newVerticie = malloc(sizeof(Verticie));
-  newVerticie->letter = letter;
-  newVerticie->list = NULL;
-  return newVerticie;
+Vertex *createNewVertex(Letter letter) {
+  Vertex *newVertex = malloc(sizeof(Vertex));
+  newVertex->letter = letter;
+  newVertex->list = NULL;
+  return newVertex;
 }
 
-void createEdge(Verticie *from, Verticie *to) {
+void createEdge(Vertex *from, Vertex *to) {
   // create the adj list
   createNewAdjacencyList(from, to);
   createNewAdjacencyList(to, from);
 }
 
-void createNewAdjacencyList(Verticie *from, Verticie *to) {
+void createNewAdjacencyList(Vertex *from, Vertex *to) {
 
   AdjacencyList *newList = malloc(sizeof(AdjacencyList));
   newList->neighbour = to;
@@ -98,18 +98,18 @@ void createNewAdjacencyList(Verticie *from, Verticie *to) {
   current->next = newList;
 }
 
-void DFS(Verticie *verticie) {
+void DFS(Vertex *vertex) {
 
   bool arr[4] = {0};
-  DFSHelper(arr, verticie);
+  DFSHelper(arr, vertex);
 }
 
-void DFSHelper(bool *arr, Verticie *verticie) {
+void DFSHelper(bool *arr, Vertex *vertex) {
 
-  arr[verticie->letter] = true;
-  printf("%c -> ", 'A' + verticie->letter);
+  arr[vertex->letter] = true;
+  printf("%c -> ", 'A' + vertex->letter);
 
-  AdjacencyList *current = verticie->list;
+  AdjacencyList *current = vertex->list;
 
   while (current != NULL) {
     if (arr[current->neighbour->letter] == false) {
@@ -119,13 +119,13 @@ void DFSHelper(bool *arr, Verticie *verticie) {
   }
 }
 
-void BFS(Queue *q, Verticie *start) {
+void BFS(Queue *q, Vertex *start) {
   bool visited[4] = {false};
   enqueue(q, start);
   visited[start->letter] = true;
 
   while (q->front != NULL) {
-    Verticie *currentVert = dequeue(q);
+    Vertex *currentVert = dequeue(q);
     printf("%c -> ", 'A' + currentVert->letter);
     AdjacencyList *neighbor = currentVert->list;
 
@@ -147,10 +147,10 @@ Queue *createQueue() {
   return q;
 }
 
-void enqueue(Queue *q, Verticie *verticie) {
+void enqueue(Queue *q, Vertex *vertex) {
 
   Node *newNode = (Node *)malloc(sizeof(Node));
-  newNode->verticie = verticie;
+  newNode->vertex = vertex;
   newNode->next = NULL;
 
   if (q->rear == NULL) {
@@ -160,12 +160,12 @@ void enqueue(Queue *q, Verticie *verticie) {
     q->rear = newNode;
   }
 }
-Verticie *dequeue(Queue *q) {
+Vertex *dequeue(Queue *q) {
   if (q->front == NULL)
     return NULL;
 
   Node *temp = q->front;
-  Verticie *v = temp->verticie;
+  Vertex *v = temp->vertex;
   q->front = q->front->next;
   if (q->front == NULL)
     q->rear = NULL;
@@ -173,7 +173,7 @@ Verticie *dequeue(Queue *q) {
   return v;
 }
 
-void printAdjacencyList(Verticie *v) {
+void printAdjacencyList(Vertex *v) {
   printf("Neighbours of %c: ", 'A' + v->letter);
   AdjacencyList *current = v->list;
   while (current != NULL) {
@@ -190,7 +190,7 @@ void printQueue(Queue *q) {
   }
   Node *temp = q->front;
   while (temp != NULL) {
-    printf("%d -> ", temp->verticie->letter);
+    printf("%d -> ", temp->vertex->letter);
     temp = temp->next;
   }
 }

@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,24 +14,15 @@ typedef struct AdjList {
 
 typedef struct Vertex {
   Letter letter;
-  int distance; // used for the dijkstras algo
-  bool visited; // used for the dijkstras algo
   AdjList *list;
 } Vertex;
 
-// global variables
-// keep track of all the verticies
-Vertex *arr[9];
-int count = 0;
-
 Vertex *createNewVertex(Letter letter);
-void createNewList(Vertex *from, Vertex *to, int weight);
+void createNewAdjList(Vertex *from, Vertex *to, int weight);
 void createEdge(Vertex *from, Vertex *to, int weight);
-void printGraph(Vertex *vertex);
-void dijkstrasAlgo(Vertex *start, Vertex *targetVertex);
+void printGraph(Vertex *Verticie);
 
 int main() {
-
   Vertex *vA = createNewVertex(A);
   Vertex *vB = createNewVertex(B);
   Vertex *vC = createNewVertex(C);
@@ -68,81 +58,36 @@ int main() {
   printGraph(vH);
   printGraph(vI);
 
-  dijkstrasAlgo(vA, vH);
-
   return 0;
-}
-
-void dijkstrasAlgo(Vertex *start, Vertex *target) {
-  start->distance = 0;
-  while (true) {
-    Vertex *current = NULL;
-    int minDist = INT_MAX;
-    for (int i = 0; i < count; i++) {
-      if (!arr[i]->visited && arr[i]->distance < minDist) {
-        minDist = arr[i]->distance;
-        current = arr[i];
-      }
-    }
-    if (current == NULL) {
-      break;
-    }
-    current->visited = true;
-    if (current == target) {
-      break;
-    }
-    AdjList *adj = current->list;
-    while (adj != NULL) {
-      Vertex *neighbor = adj->neighbour;
-      if (!neighbor->visited) {
-        int newDist = current->distance + adj->weight;
-        if (newDist < neighbor->distance) {
-          neighbor->distance = newDist;
-        }
-      }
-      adj = adj->next;
-    }
-  }
-  if (target->distance != INT_MAX) {
-    printf("Shortest distance from %c to %c: %d\n", 'A' + start->letter,
-           'A' + target->letter, target->distance);
-  } else {
-    printf("No path found from %c to %c.\n", 'A' + start->letter,
-           'A' + target->letter);
-  }
 }
 
 Vertex *createNewVertex(Letter letter) {
   Vertex *newVertex = malloc(sizeof(Vertex));
   newVertex->letter = letter;
   newVertex->list = NULL;
-  newVertex->visited = false;
-  newVertex->distance = INT_MAX; // set the distance to infinity
-  arr[count] = newVertex;
-  count++;
   return newVertex;
 }
 
-void createNewList(Vertex *from, Vertex *to, int weight) {
-  AdjList *newList = malloc(sizeof(AdjList));
-  newList->neighbour = to;
-  newList->weight = weight;
-  newList->next = NULL;
+void createNewAdjList(Vertex *from, Vertex *to, int weight) {
+  AdjList *newAdjList = malloc(sizeof(AdjList));
+  newAdjList->neighbour = to;
+  newAdjList->next = NULL;
+  newAdjList->weight = weight;
 
   if (from->list == NULL) {
-    from->list = newList;
+    from->list = newAdjList;
     return;
   }
+
   AdjList *current = from->list;
   while (current->next != NULL) {
     current = current->next;
   }
-  from->list->next = newList;
+  from->list->next = newAdjList;
 }
 
 void createEdge(Vertex *from, Vertex *to, int weight) {
-  // directed graph with weight
-  createNewList(from, to, weight);
+  createNewAdjList(from, to, weight);
 }
 
 void printGraph(Vertex *vertex) {
