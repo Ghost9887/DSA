@@ -43,24 +43,31 @@ void enqueue(PriorityQueue *pq, int data) {
   Node *newNode = malloc(sizeof(Node));
   newNode->data = data;
   newNode->next = NULL;
+
   printf("Enqueuing: %d\n", data);
+
   if (pq->front == NULL) {
     pq->front = pq->rear = newNode;
+    return;
   }
 
-  PriorityQueue *current = pq;
-
-  while (current->front->next != NULL) {
-    if (data > current->front->next->data) {
-      PriorityQueue *temp = current;
-      current->front = current->front->next;
-      current->front->next = temp->front;
-      pq = current;
-      return;
-    }
-    current->front = current->front->next;
+  if (data > pq->front->data) {
+    newNode->next = pq->front;
+    pq->front = newNode;
+    return;
   }
-  pq = current;
+
+  Node *current = pq->front;
+  while (current->next != NULL && current->next->data >= data) {
+    current = current->next;
+  }
+
+  newNode->next = current->next;
+  current->next = newNode;
+
+  if (newNode->next == NULL) {
+    pq->rear = newNode;
+  }
 }
 
 void dequeue(PriorityQueue *q) {
@@ -73,6 +80,7 @@ void dequeue(PriorityQueue *q) {
   if (q->front == NULL) {
     q->rear = NULL;
   }
+  printf("Dequeuing: %d\n", temp->data);
   free(temp);
 }
 
@@ -93,14 +101,15 @@ void peekRear(PriorityQueue *pq) {
 }
 
 void printQueue(PriorityQueue *pq) {
-
   if (pq->front == NULL) {
     printf("Queue is empty!\n");
+    return;
   }
-
-  PriorityQueue *current = pq;
-  while (current->front != current->rear) {
-    printf("%d -> ", current->front->data);
-    current->front = current->front->next;
+  Node *current = pq->front;
+  printf("Queue: ");
+  while (current != NULL) {
+    printf("%d -> ", current->data);
+    current = current->next;
   }
+  printf("NULL\n");
 }
