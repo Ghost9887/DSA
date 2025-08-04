@@ -17,10 +17,20 @@ typedef struct Vertex {
   AdjList *list;
 } Vertex;
 
+typedef struct {
+  Vertex *front;
+  Vertex *rear;
+} PriorityQueue;
+
 Vertex *createNewVertex(Letter letter);
 void createNewAdjList(Vertex *from, Vertex *to, int weight);
 void createEdge(Vertex *from, Vertex *to, int weight);
 void printGraph(Vertex *Verticie);
+PriorityQueue *initializeQueue();
+void enqueue(PriorityQueue *pq, Vertex *vertex);
+void dequeue(PriorityQueue *pq);
+void peek(PriorityQueue *pq);
+void printQueue(PriorityQueue *pq);
 
 int main() {
   Vertex *vA = createNewVertex(A);
@@ -58,7 +68,80 @@ int main() {
   printGraph(vH);
   printGraph(vI);
 
+  PriorityQueue *pq = initializeQueue();
+  enqueue(pq, vA);
+  enqueue(pq, vB);
+  printQueue(pq);
+
   return 0;
+}
+
+PriorityQueue *initializeQueue() {
+  PriorityQueue *pq = malloc(sizeof(PriorityQueue));
+  pq->front = NULL;
+  pq->rear = NULL;
+  return pq;
+}
+
+void enqueue(PriorityQueue *pq, Vertex *vertex) {
+
+  if (pq->front == NULL) {
+    pq->front = pq->rear = vertex;
+  }
+
+  if (vertex->list->weight > pq->front->list->weight) {
+    vertex->list->next = pq->front->list;
+    pq->front = vertex;
+  }
+
+  Vertex *current = pq->front;
+  while (current->list->next != NULL &&
+         current->list->next->weight >= current->list->weight) {
+    current->list = current->list->next;
+  }
+
+  vertex->list->next = current->list->next;
+  current->list->next = vertex->list;
+
+  if (vertex->list->next == NULL) {
+    pq->rear = vertex;
+  }
+}
+
+void dequeue(PriorityQueue *pq) {
+
+  if (pq->front == NULL) {
+    printf("Queue is empty!\n");
+  }
+
+  pq->front->list = pq->front->list->next;
+
+  if (pq->front == NULL) {
+    pq->rear = pq->front;
+  }
+}
+
+void peek(PriorityQueue *pq) {
+
+  if (pq->front == NULL) {
+    printf("Queue is empty!\n");
+  }
+
+  printf("Peek: %c", 'A' + pq->front->letter);
+}
+
+void printQueue(PriorityQueue *pq) {
+  if (pq->front == NULL) {
+    printf("Queue is empty!\n");
+    return;
+  }
+  Vertex *current = pq->front;
+  printf("Queue: ");
+  while (current != NULL) {
+    printf("%c -> ", 'A' + current->letter);
+    current->list = current->list->next;
+  }
+  printf("NULL\n");
 }
 
 Vertex *createNewVertex(Letter letter) {
