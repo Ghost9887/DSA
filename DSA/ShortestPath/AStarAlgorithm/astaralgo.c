@@ -15,162 +15,181 @@ typedef struct AdjList {
 typedef struct Vertex {
   Letter letter;
   AdjList *list;
+
+  int gCost;
+  int hCost;
+  int fCost;
+  bool visited;
+
+  Vertex *parent;
+  struct Vertex *nextInQueue;
 } Vertex;
 
 typedef struct {
   Vertex *front;
-  Vertex *rear;
 } PriorityQueue;
 
 Vertex *createNewVertex(Letter letter);
-void createNewAdjList(Vertex *from, Vertex *to, int weight);
 void createEdge(Vertex *from, Vertex *to, int weight);
-void printGraph(Vertex *Verticie);
+void createNewAdjList(Vertex *from, Vertex *to, int weight);
+void printGraph(Vertex *vertex);
+void printPath(Vertex *goal);
+int heuristic(Vertex *a, Vertex *b);
+
 PriorityQueue *initializeQueue();
 void enqueue(PriorityQueue *pq, Vertex *vertex);
-void dequeue(PriorityQueue *pq);
-void peek(PriorityQueue *pq);
+Vertex *dequeue(PriorityQueue *pq);
 void printQueue(PriorityQueue *pq);
 
+void astar(Vertex *start, Vertex *goal);
+
 int main() {
-  Vertex *vA = createNewVertex(A);
-  Vertex *vB = createNewVertex(B);
-  Vertex *vC = createNewVertex(C);
-  Vertex *vD = createNewVertex(D);
-  Vertex *vE = createNewVertex(E);
-  Vertex *vF = createNewVertex(F);
-  Vertex *vG = createNewVertex(G);
-  Vertex *vH = createNewVertex(H);
-  Vertex *vI = createNewVertex(I);
+  Vertex *v[9];
+  for (int i = A; i <= I; i++)
+    v[i] = createNewVertex(i);
 
-  createEdge(vA, vB, 1);
-  createEdge(vA, vD, 4);
-  createEdge(vB, vC, 2);
-  createEdge(vB, vE, 3);
-  createEdge(vC, vF, 1);
-  createEdge(vC, vG, 2);
-  createEdge(vD, vE, 2);
-  createEdge(vD, vI, 3);
-  createEdge(vE, vG, 3);
-  createEdge(vE, vI, 3);
-  createEdge(vF, vG, 1);
-  createEdge(vG, vH, 6);
-  createEdge(vH, vI, 2);
-  createEdge(vI, vC, 4); // Optional cycle
-  createEdge(vI, vF, 2); // Shortcut
-  printGraph(vA);
-  printGraph(vB);
-  printGraph(vC);
-  printGraph(vD);
-  printGraph(vE);
-  printGraph(vF);
-  printGraph(vG);
-  printGraph(vH);
-  printGraph(vI);
+  createEdge(v[A], v[B], 1);
+  createEdge(v[A], v[D], 4);
+  createEdge(v[B], v[C], 2);
+  createEdge(v[B], v[E], 3);
+  createEdge(v[C], v[F], 1);
+  createEdge(v[C], v[G], 2);
+  createEdge(v[D], v[E], 2);
+  createEdge(v[D], v[I], 3);
+  createEdge(v[E], v[G], 3);
+  createEdge(v[E], v[I], 3);
+  createEdge(v[F], v[G], 1);
+  createEdge(v[G], v[H], 6);
+  createEdge(v[H], v[I], 2);
+  createEdge(v[I], v[C], 4);
+  createEdge(v[I], v[F], 2);
 
-  PriorityQueue *pq = initializeQueue();
-  enqueue(pq, vA);
-  enqueue(pq, vB);
-  printQueue(pq);
+  for (int i = A; i <= I; i++) {
+    printGraph(v[i]);
+  }
+
+  astar(v[A], v[H]);
 
   return 0;
+}
+
+Vertex *createNewVertex(Letter letter) {
+  Vertex *v = malloc(sizeof(Vertex));
+  v->letter = letter;
+  v->list = NULL;
+  v->gCost = 9999;
+  v->hCost = 0;
+  v->fCost = 9999;
+  v->visited = false;
+  v->parent = NULL;
+  v->nextInQueue = NULL;
+  return v;
+}
+
+void createNewAdjList(Vertex *from, Vertex *to, int weight) {
+  AdjList *adj = malloc(sizeof(AdjList));
+  adj->neighbour = to;
+  adj->weight = weight;
+  adj->next = NULL;
+
+  if (from->list == NULL) {
+    from->list = adj;
+  } else {
+    AdjList *curr = from->list;
+    while (curr->next != NULL)
+      curr = curr->next;
+    curr->next = adj;
+  }
+}
+
+void createEdge(Vertex *from, Vertex *to, int weight) {
+  createNewAdjList(from, to, weight);
 }
 
 PriorityQueue *initializeQueue() {
   PriorityQueue *pq = malloc(sizeof(PriorityQueue));
   pq->front = NULL;
-  pq->rear = NULL;
   return pq;
 }
 
 void enqueue(PriorityQueue *pq, Vertex *vertex) {
-
-  if (pq->front == NULL) {
-    pq->front = pq->rear = vertex;
-  }
-
-  if (vertex->list->weight > pq->front->list->weight) {
-    vertex->list->next = pq->front->list;
+  if (pq->front == NULL || vertex->fCost < pq->front->fCost) {
+    vertex->nextInQueue = pq->front;
     pq->front = vertex;
-  }
-
-  Vertex *current = pq->front;
-  while (current->list->next != NULL &&
-         current->list->next->weight >= current->list->weight) {
-    current->list = current->list->next;
-  }
-
-  vertex->list->next = current->list->next;
-  current->list->next = vertex->list;
-
-  if (vertex->list->next == NULL) {
-    pq->rear = vertex;
-  }
-}
-
-void dequeue(PriorityQueue *pq) {
-
-  if (pq->front == NULL) {
-    printf("Queue is empty!\n");
-  }
-
-  pq->front->list = pq->front->list->next;
-
-  if (pq->front == NULL) {
-    pq->rear = pq->front;
-  }
-}
-
-void peek(PriorityQueue *pq) {
-
-  if (pq->front == NULL) {
-    printf("Queue is empty!\n");
-  }
-
-  printf("Peek: %c", 'A' + pq->front->letter);
-}
-
-void printQueue(PriorityQueue *pq) {
-  if (pq->front == NULL) {
-    printf("Queue is empty!\n");
-    return;
-  }
-  Vertex *current = pq->front;
-  printf("Queue: ");
-  while (current != NULL) {
-    printf("%c -> ", 'A' + current->letter);
-    current->list = current->list->next;
-  }
-  printf("NULL\n");
-}
-
-Vertex *createNewVertex(Letter letter) {
-  Vertex *newVertex = malloc(sizeof(Vertex));
-  newVertex->letter = letter;
-  newVertex->list = NULL;
-  return newVertex;
-}
-
-void createNewAdjList(Vertex *from, Vertex *to, int weight) {
-  AdjList *newAdjList = malloc(sizeof(AdjList));
-  newAdjList->neighbour = to;
-  newAdjList->next = NULL;
-  newAdjList->weight = weight;
-
-  if (from->list == NULL) {
-    from->list = newAdjList;
     return;
   }
 
-  AdjList *current = from->list;
-  while (current->next != NULL) {
-    current = current->next;
+  Vertex *current = pq->front;
+  while (current->nextInQueue != NULL &&
+         current->nextInQueue->fCost <= vertex->fCost) {
+    current = current->nextInQueue;
   }
-  from->list->next = newAdjList;
+
+  vertex->nextInQueue = current->nextInQueue;
+  current->nextInQueue = vertex;
 }
 
-void createEdge(Vertex *from, Vertex *to, int weight) {
-  createNewAdjList(from, to, weight);
+Vertex *dequeue(PriorityQueue *pq) {
+  if (pq->front == NULL)
+    return NULL;
+  Vertex *v = pq->front;
+  pq->front = pq->front->nextInQueue;
+  v->nextInQueue = NULL;
+  return v;
+}
+
+void astar(Vertex *start, Vertex *goal) {
+  start->gCost = 0;
+  start->hCost = heuristic(start, goal);
+  start->fCost = start->hCost;
+
+  PriorityQueue *pq = initializeQueue();
+  enqueue(pq, start);
+
+  while (pq->front != NULL) {
+    Vertex *current = dequeue(pq);
+    current->visited = true;
+
+    if (current == goal) {
+      printf("Path found:\n");
+      printPath(goal);
+      return;
+    }
+
+    AdjList *adj = current->list;
+    while (adj != NULL) {
+      Vertex *neighbor = adj->neighbour;
+
+      if (neighbor->visited) {
+        adj = adj->next;
+        continue;
+      }
+
+      int tentativeG = current->gCost + adj->weight;
+      if (tentativeG < neighbor->gCost) {
+        neighbor->parent = current;
+        neighbor->gCost = tentativeG;
+        neighbor->hCost = heuristic(neighbor, goal);
+        neighbor->fCost = neighbor->gCost + neighbor->hCost;
+        enqueue(pq, neighbor);
+      }
+      adj = adj->next;
+    }
+  }
+
+  printf("No path found.\n");
+}
+
+int heuristic(Vertex *a, Vertex *b) {
+  // Simple placeholder heuristic: absolute difference in letter value
+  return a->letter - b->letter;
+}
+
+void printPath(Vertex *goal) {
+  if (goal->parent != NULL) {
+    printPath(goal->parent);
+  }
+  printf("%c \n", 'A' + goal->letter);
 }
 
 void printGraph(Vertex *vertex) {
