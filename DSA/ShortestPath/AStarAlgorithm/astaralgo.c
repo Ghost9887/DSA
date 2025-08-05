@@ -181,7 +181,6 @@ void astar(Vertex *start, Vertex *goal) {
 }
 
 int heuristic(Vertex *a, Vertex *b) {
-  // Simple placeholder heuristic: absolute difference in letter value
   return a->letter - b->letter;
 }
 
